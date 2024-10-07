@@ -1,4 +1,8 @@
+from typing import TextIO
+import settings
 from settings import *
+
+
 
 
 def show_start_screen():
@@ -68,3 +72,86 @@ def show_end_screen():
             if event.type == pg.KEYDOWN:
                 pg.quit()
                 exit()
+
+
+def show_main_menu():
+    screen.fill('black')
+    font = pg.font.SysFont('Arial', 48)
+
+    # Тексты кнопок
+    new_game_text = font.render("Новая игра", True, (255, 255, 255))
+    load_game_text = font.render("Загрузить сохранение", True,
+                                 (255, 255, 255))  # Пока неактивная
+    exit_text = font.render("Выход", True, (255, 255, 255))
+
+    # Координаты кнопок
+    new_game_rect = new_game_text.get_rect(
+        center=(window // 2, window // 2 - 60))
+    load_game_rect = load_game_text.get_rect(center=(window // 2, window // 2))
+    exit_rect = exit_text.get_rect(center=(window // 2, window // 2 + 60))
+
+    # Отрисовка кнопок
+    screen.blit(new_game_text, new_game_rect)
+    screen.blit(load_game_text, load_game_rect)
+    screen.blit(exit_text, exit_rect)
+    pg.display.flip()
+
+    # Ждем, пока игрок не нажмет на одну из кнопок
+    waiting = True
+    while waiting:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                exit()
+            if event.type == pg.MOUSEBUTTONDOWN:
+                # Получаем позицию клика
+                mouse_pos = pg.mouse.get_pos()
+
+                # Проверяем, попал ли клик в одну из кнопок
+                if load_game_rect.collidepoint(mouse_pos):
+                    settings.current_level = load_progress()
+                    waiting = False
+                if new_game_rect.collidepoint(mouse_pos):
+                    waiting = False  # Запуск новой игры
+
+                elif exit_rect.collidepoint(mouse_pos):
+                    pg.quit()
+                    exit()
+
+
+def show_post_level_screen(current_level):
+    screen.fill('black')
+    font = pg.font.SysFont('Arial', 48)
+
+    next_level_text = font.render("Следующий уровень", True, (255, 255, 255))
+    save_progress_text = font.render("Сохранить прогресс", True,
+                                     (255, 255, 255))
+
+    next_level_rect = next_level_text.get_rect(
+        center=(window // 2, window // 2 - 40))
+    save_progress_rect = save_progress_text.get_rect(
+        center=(window // 2, window // 2 + 40))
+
+    screen.blit(next_level_text, next_level_rect)
+    screen.blit(save_progress_text, save_progress_rect)
+    pg.display.flip()
+
+    waiting = True
+    while waiting:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                exit()
+            if event.type == pg.MOUSEBUTTONDOWN:
+                mouse_pos = pg.mouse.get_pos()
+
+                # Проверяем, на какую кнопку кликнул игрок
+                if next_level_rect.collidepoint(mouse_pos):
+                    waiting = False
+                    return "next"
+                elif save_progress_rect.collidepoint(mouse_pos):
+                    save_progress(current_level)
+                    print(
+                        f"Progress saved at level {current_level}!")  # Для отладки
+
+

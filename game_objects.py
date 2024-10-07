@@ -12,9 +12,9 @@ class GameCells:
 
     def __init__(self):
         self.top = info_height + tile_size // 2
-        self.bottom = window - tile_size // 2
+        self.bottom = window_height - tile_size // 2
         self.left = 0 + tile_size // 2
-        self.right = window - tile_size // 2
+        self.right = window_width - tile_size // 2
         self.game_area = {(x, y): 0 for x in
                           range(self.left, self.right, tile_size)
                           for y in
@@ -46,8 +46,12 @@ class Snake:
         self.segments.append(self.head.copy())
         self.segments = self.segments[-self.length:]
 
-    def get_start_position(self):
-        self.head.center = get_random_position()
+    def get_start_position(self, wall_segments):
+        x,y = get_random_position()
+        next_pos = pg.Rect(x,y,49,49)
+        wall_collapsing = pg.Rect.collidelist(next_pos, wall_segments) == -1
+        if wall_collapsing:
+               self.head.center = get_random_position()
 
     def get_new_direction(self, event_key):
         direction_changes = {
@@ -68,8 +72,8 @@ class Snake:
         self_eating = pg.Rect.collidelist(self.head,
                                           self.segments[:-1]) != -1
         wall_collapsing = pg.Rect.collidelist(self.head, wall_segments) != -1
-        if (self.head.left < 0 or self.head.right > window
-                or self.head.top < info_height or self.head.bottom > window
+        if (self.head.left < 0 or self.head.right > window_width
+                or self.head.top < info_height or self.head.bottom > window_height
                 or self_eating or wall_collapsing):
             return True
         return False
