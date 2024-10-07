@@ -41,6 +41,7 @@ class BaseLevel:
 
     def check_death(self):
         if self.snake.is_dead(self.wall.segments + self.wall.square_segments):
+
             self.lives -= 1
             self.reset_level()
 
@@ -112,3 +113,7 @@ class LevelDynamicObstacles(BaseLevel):
     def reset_level(self):
         super().reset_level()
         self.wall.square_segments.clear()
+
+
+class InfiniteLevel(BaseLevel):
+    pass

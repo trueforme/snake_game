@@ -32,6 +32,7 @@ directions = {pg.K_w: (0, -tile_size), pg.K_s: (0, +tile_size),
 SAVE_FILE = "save_data.json"
 
 def save_progress(level_number: int) -> None:
+    print('tried to save')
     save_data = {"current_level": level_number}
     try:
         with open(SAVE_FILE, 'w') as save_file:  # type: TextIO
