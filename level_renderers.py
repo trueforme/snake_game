@@ -32,11 +32,11 @@ def show_between_screen():
     screen.fill('black')
     font = pg.font.SysFont('Arial', 48)
     control_text = font.render("Уровень пройден!", True, (255, 255, 255))
+    screen.blit(control_text, (window_width // 2 - control_text.get_width() // 2,
+                               window_height // 2 - control_text.get_height() // 2 - 60))
     start_text1 = font.render("Нажмите любую кнопку,", True, (255, 255, 255))
     start_text2 = font.render("чтобы начать следующий", True, (255, 255, 255))
 
-    screen.blit(control_text, (window_width // 2 - control_text.get_width() // 2,
-                               window_height // 2 - control_text.get_height() // 2 - 60))
     screen.blit(start_text1, (window_width // 2 - start_text1.get_width() // 2,
                               window_height // 2 - start_text1.get_height() // 2))
     screen.blit(start_text2, (window_width // 2 - start_text2.get_width() // 2,
@@ -58,10 +58,33 @@ def show_end_screen():
     font = pg.font.SysFont('Arial', 48)
     control_text = font.render("Поздравляем!", True, (255, 255, 255))
     start_text1 = font.render("Все уровни пройдены!", True, (255, 255, 255))
+    text2 = font.render("Нажмите любую кнопку", True, (255, 255, 255))
     screen.blit(control_text, (window_width // 2 - control_text.get_width() // 2,
                                window_height // 2 - control_text.get_height() // 2 - 60))
     screen.blit(start_text1, (window_width // 2 - start_text1.get_width() // 2,
                               window_height // 2 - start_text1.get_height() // 2))
+    screen.blit(text2,(window_width // 2 - text2.get_width() // 2,
+                              window_height // 2 - text2.get_height() // 2 + 120))
+    pg.display.flip()
+
+    while True:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                exit()
+            if event.type == pg.KEYDOWN:
+                return
+
+
+def show_death_screen():
+    screen.fill('black')
+    font = pg.font.SysFont('Arial', 48)
+    death_text = font.render("Змейка стукнулась..", True, (255, 255, 255))
+    retry_text = font.render("Нажмите любую кнопку", True, (255, 255, 255))
+    screen.blit(death_text, (window_width // 2 - death_text.get_width() // 2,
+                               window_height // 2 - death_text.get_height() // 2 - 60))
+    screen.blit(retry_text, (window_width // 2 - death_text.get_width() // 2,
+                             window_height // 2 - death_text.get_height() // 2 + 60))
     pg.display.flip()
 
     while True:
@@ -113,7 +136,7 @@ def show_main_menu():
                 # Проверяем, попал ли клик в одну из кнопок
                 if new_game_rect.collidepoint(mouse_pos):
                     waiting = False  # Запуск новой игры
-                    save_progress(1)
+                    return "new_game"
 
                 if load_game_rect.collidepoint(mouse_pos):
                     settings.current_level = load_progress()
@@ -130,15 +153,19 @@ def show_main_menu():
 def show_post_level_screen(level_number):
     screen.fill('black')
     font = pg.font.SysFont('Arial', 48)
-
+    control_text = font.render("Уровень пройден!", True, (255, 255, 255))
     next_level_text = font.render("Следующий уровень", True, (255, 255, 255))
     save_progress_text = font.render("Сохранить прогресс", True,
                                      (255, 255, 255))
 
+    screen.blit(control_text,
+                (window_width // 2 - control_text.get_width() // 2,
+                 window_height // 2 - control_text.get_height() // 2 - 60))
+
     next_level_rect = next_level_text.get_rect(
-        center=(window_width // 2, window_height // 2 - 40))
+        center=(window_width // 2, window_height // 2 + 60))
     save_progress_rect = save_progress_text.get_rect(
-        center=(window_width // 2, window_height // 2 + 40))
+        center=(window_width // 2, window_height // 2 + 140))
 
     screen.blit(next_level_text, next_level_rect)
     screen.blit(save_progress_text, save_progress_rect)
@@ -156,7 +183,7 @@ def show_post_level_screen(level_number):
                 # Проверяем, на какую кнопку кликнул игрок
                 if next_level_rect.collidepoint(mouse_pos):
                     waiting = False
-                    return "next"
+                    return level_number + 1
                 elif save_progress_rect.collidepoint(mouse_pos):
                     save_progress(level_number)
                     print(

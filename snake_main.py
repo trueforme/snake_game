@@ -1,3 +1,4 @@
+import settings
 from Levels import *
 import pygame as pg
 
@@ -13,7 +14,6 @@ def run(level):
                 exit()
             if event.type == pg.KEYDOWN:
                 level.snake.direction = level.snake.get_new_direction(event.key)
-
         level.draw_basics()
         level.draw_info_panel()
         level.check_death()
@@ -22,7 +22,10 @@ def run(level):
         level.tick_game_timings()
 
         if level.snake.length - 1 >= level.goal:
-            running = False
+            settings.game_state = "between_levels"
+            return
+        if settings.game_state in ["main_menu","game_over"]:
+            return
 
 
 
@@ -38,47 +41,50 @@ def get_level_by_number(number):
     if number == 3:
         return LevelDynamicObstacles(Snake(), Food(), lives, Wall(), GameCells(),
                                      SpecialFood(), 4, screen)
-    if number == 4:
-        return InfiniteLevel(Snake(), Food(), lives, Wall(), GameCells(),
+    if number == 8:
+        return InfiniteLevel(Snake(), Food(), 1, Wall(), GameCells(),
                                      SpecialFood(), 100, screen)
 
 
 def main():
     pg.init()
     clock_main = clock
-    game_state = 'main_menu'  # Начальное состояние игры - главное меню
     current_level_number = load_progress()
-    max_levels = 3  # Количество уровней в игре
+    max_level_number = 3  # Количество уровней в игре
 
     while True:
+        if settings.game_state == 'main_menu':
+            settings.game_state = show_main_menu()
 
-        if game_state == 'main_menu':
-            game_state = show_main_menu()  # Отображение главного меню  # Если игрок начал игру
+        if settings.game_state == 'new_game':
+            current_level_number = 1
+            settings.game_state = 'level'
 
-
-        elif game_state == 'level':
+        if settings.game_state == 'level':
             level = get_level_by_number(current_level_number)
             run(level)
-            show_post_level_screen(current_level_number)
-            if current_level_number >= max_levels:
-                game_state = 'game_over'
-            else:
-                game_state = 'between_levels'
 
-        elif game_state == 'infinite':
-            level = get_level_by_number(4)
+            if (current_level_number == max_level_number and
+                    settings.game_state != 'game_over'):
+                settings.game_state = 'main_menu'
+                show_end_screen()
+        print(settings.game_state)
+
+        if settings.game_state == 'infinite':
+            level = get_level_by_number(8)
             run(level)
 
-        elif game_state == 'between_levels':
-            show_between_screen()  # Экран между уровнями
-            current_level_number += 1
-            game_state = 'level'  # Переходим к следующему уровню
+        if settings.game_state == 'between_levels':
+            current_level_number = show_post_level_screen(current_level_number)
+            print(current_level_number)
+            # Экран между уровнями
+            if current_level_number > max_level_number:
+                show_end_screen()
+            settings.game_state = 'level'  # Переходим к следующему уровню
 
 
-        elif game_state == 'game_over':
-            show_end_screen()
-            show_main_menu()
-            game_state = 'main_menu'  # Возвращаемся в главное меню для перезапуска
+        if settings.game_state == 'game_over':
+            settings.game_state = 'main_menu' # Возвращаемся в главное меню для перезапуска
 
         clock_main.tick(15)  # Ограничиваем количество кадров в секунду
 

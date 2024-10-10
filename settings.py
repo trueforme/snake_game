@@ -9,7 +9,7 @@ delta_time = 120
 clock = pg.time.Clock()
 time, time_step = 0, 120
 lives = 3
-
+game_state = 'main_menu'
 current_level = 1
 
 window = 1200

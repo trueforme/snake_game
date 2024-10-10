@@ -94,6 +94,7 @@ class Wall:
     def __init__(self):
         self.cell_size = 50
         self.segments = []
+        self.square_segments = []
 
     def create_wall_cell(self, game_area, snake_head):
         empty_cells = [cell[0] for cell in game_area.items() if cell[1] == 0]

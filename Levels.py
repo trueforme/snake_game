@@ -1,3 +1,4 @@
+import settings
 from game_objects import Snake, Food, Wall, GameCells, SpecialFood
 from level_renderers import *
 
@@ -17,11 +18,11 @@ class BaseLevel:
         self.number = 1
 
     def reset_level(self):
+        if self.lives <= 0:
+            settings.game_state = "game_over"
+            return
         self.screen.fill('black')
         self.time, self.time_step = 0, 120
-        if self.lives <= 0:
-            # отправка в мейн
-            exit()
         self.snake = Snake()
         self.food = Food()
         self.gold = SpecialFood()
@@ -41,8 +42,8 @@ class BaseLevel:
 
     def check_death(self):
         if self.snake.is_dead(self.wall.segments + self.wall.square_segments):
-
             self.lives -= 1
+            show_death_screen()
             self.reset_level()
 
     def check_eating(self):
