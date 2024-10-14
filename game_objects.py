@@ -22,21 +22,18 @@ class GameCells:
 
     def fill_cells_condition(self, snake_segments, wall_segments,
                              food_segments):
-        # Очищаем все клетки игрового поля перед обновлением
+
         for cell in self.game_area.keys():
             self.game_area[cell] = 0
 
-        # Обновляем клетки для стен
         for segment in wall_segments:
             if segment != (0, 0):
                 self.game_area[segment.center] = 3
 
-        # Обновляем клетки для змейки
         for segment in snake_segments:
             if segment != (0, 0):
                 self.game_area[segment.center] = 2
 
-        # Обновляем клетки для еды
         for segment in food_segments:
             if segment != (0, 0) and segment is not None:
                 self.game_area[segment.rect.center] = 1
@@ -49,11 +46,13 @@ class Snake:
         self.length = 1
         self.head = pg.Rect(0, 0, self.cell_size, self.cell_size)
         self.segments = [self.head.copy()]
+        self.direction_changed = False
 
     def move(self):
         self.head.move_ip(self.direction)
         self.segments.append(self.head.copy())
         self.segments = self.segments[-self.length:]
+        self.direction_changed = False
 
     def get_start_position(self, wall_segments):
         x,y = get_random_position()
@@ -73,9 +72,10 @@ class Snake:
             pg.K_d: (tile_size, 0) if self.direction[
                                           0] == 0 else self.direction
         }
-        if event_key not in direction_changes.keys():
-            return self.direction
-        return direction_changes.get(event_key)
+        next_direction = direction_changes.get(event_key)
+        if next_direction != self.direction:
+            self.direction = next_direction
+            self.direction_changed = False
 
     def is_dead(self, wall_segments):
         self_eating = pg.Rect.collidelist(self.head,

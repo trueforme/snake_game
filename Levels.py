@@ -1,4 +1,3 @@
-import settings
 from game_objects import Snake, Food, Wall, GameCells, SpecialFood
 from level_renderers import *
 
@@ -34,10 +33,10 @@ class BaseLevel:
     def draw_info_panel(self):
         font = pg.font.SysFont('game', 36)
         score_text = font.render(f"Score: {self.snake.length - 1}", True, (255, 255, 255))
-        lifes_text = font.render(f"Lives: {self.lives}", True, (255, 255, 255))
+        lives_text = font.render(f"Lives: {self.lives}", True, (255, 255, 255))
         goal_text = font.render(f"Goal: {self.goal}", True, (255, 255, 255))
         self.screen.blit(score_text, (10, 10))
-        self.screen.blit(lifes_text, (10, 50))
+        self.screen.blit(lives_text, (10, 50))
         self.screen.blit(goal_text, (600, 10))
 
     def check_death(self):
@@ -90,7 +89,7 @@ class BaseLevel:
         pg.draw.rect(self.screen, 'yellow', self.gold.rect)
 
 class CommonLevel(BaseLevel):
-    pass  # No changes needed for Level1, behavior is handled in `run`
+    pass
 
 class LevelStaticObstacles(BaseLevel):
     def create_static_obstacles(self):
