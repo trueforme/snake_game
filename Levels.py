@@ -22,13 +22,13 @@ class BaseLevel:
             return
         self.screen.fill('black')
         self.time, self.time_step = 0, 120
-        self.snake = Snake()
-        self.food = Food()
-        self.gold = SpecialFood()
         self.game_cells = GameCells()
-        self.wall = Wall()
-        self.snake.get_start_position(self.wall.segments)
+        self.wall =  Wall()
+        self.snake = Snake()
+        self.snake.get_start_position(self.wall.segments + self.wall.square_segments)
+        self.food = Food()
         self.food.take_next_position(self.game_cells.game_area)
+        self.gold = SpecialFood()
 
     def draw_info_panel(self):
         font = pg.font.SysFont('game', 36)

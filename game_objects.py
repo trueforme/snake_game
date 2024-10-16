@@ -3,7 +3,7 @@ import random
 from random import randrange
 from settings import *
 
-
+random_range = (150 + tile_size // 2, 800 - tile_size // 2, tile_size)
 def get_random_position():
     return [randrange(*random_range), randrange(*random_range)]
 
@@ -55,11 +55,11 @@ class Snake:
         self.direction_changed = False
 
     def get_start_position(self, wall_segments):
-        x,y = get_random_position()
-        next_pos = pg.Rect(x,y,49,49)
-        wall_collapsing = pg.Rect.collidelist(next_pos, wall_segments) == -1
-        if wall_collapsing:
-               self.head.center = get_random_position()
+        x, y = get_random_position()
+        next_pos = pg.Rect(x, y, 49, 49)
+        not_collapsing = pg.Rect.collidelist(next_pos, wall_segments) == -1
+        if not_collapsing:
+            self.head.center = get_random_position()
 
     def get_new_direction(self, event_key):
         direction_changes = {
@@ -72,10 +72,14 @@ class Snake:
             pg.K_d: (tile_size, 0) if self.direction[
                                           0] == 0 else self.direction
         }
-        next_direction = direction_changes.get(event_key)
-        if next_direction != self.direction:
-            self.direction = next_direction
-            self.direction_changed = False
+        if event_key in direction_changes:
+            new_direction = direction_changes[event_key]
+
+            if ((self.direction[0] != -new_direction[0] and
+                    self.direction[1] != -new_direction[1]) or self.direction == (0,0))\
+                    and self.direction_changed == False:
+                self.direction = new_direction
+                self.direction_changed = True
 
     def is_dead(self, wall_segments):
         self_eating = pg.Rect.collidelist(self.head,
@@ -110,9 +114,9 @@ class Wall:
 
     def create_static_obstacle(self):
         squares = [self.make_square((100, 250)),
-                   self.make_square((600, 250)),
-                   self.make_square((100, 600)),
-                   self.make_square((600, 600))]
+                   self.make_square((window_width - 300, 250)),
+                   self.make_square((100, 550)),
+                   self.make_square((window_width - 300, 550))]
         for square in squares:
             for cell in square:
                 self.square_segments.append(cell)
@@ -120,7 +124,8 @@ class Wall:
     def make_square(self, left_top_corner):
         x0, y0 = left_top_corner[0], left_top_corner[1]
         return [pg.Rect(x, y, self.cell_size, self.cell_size) for x in
-                [x0, x0 + self.cell_size] for y in [y0, y0 + self.cell_size]]
+                [x0, x0 + self.cell_size, x0 + 2 * self.cell_size] for y in
+                [y0, y0 + self.cell_size, y0 + 2 * self.cell_size]]
 
 
 class Food:

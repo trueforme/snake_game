@@ -1,21 +1,21 @@
 import pygame as pg
 import json
 import os
-
+import logging
 delta_time = 120
 clock = pg.time.Clock()
 time, time_step = 0, 120
 lives = 3
 game_state = 'main_menu'
 current_level = 1
-
+max_level_number = 3
 window_height = 800
 window_width = 1200
 info_height = 150
 tile_size = 50
 game_area_height = window_height - info_height
 game_area_width = window_width
-random_range = (200 + tile_size // 2, 800 - tile_size // 2, tile_size)
+
 
 screen = pg.display.set_mode([window_width, window_height])
 
@@ -34,7 +34,7 @@ def save_progress(level_number: int = None, score: int = None) -> None:
             save_data = {}
 
         if level_number is not None:
-            save_data["current_level"] = level_number
+            save_data["current_level"] = min(level_number + 1,max_level_number)
 
         if score is not None:
             save_data["infinite_score"] = score
@@ -43,7 +43,8 @@ def save_progress(level_number: int = None, score: int = None) -> None:
             json.dump(save_data, save_file)
 
     except (IOError, OSError, json.JSONDecodeError) as e:
-        print(f"Ошибка при сохранении данных: {e}")
+        logger.error(f" {type(e).__name__}: {str(e)}",
+                     exc_info=True)
 
 
 def load_level_number() -> int:
@@ -56,11 +57,12 @@ def load_level_number() -> int:
                               int) and current_level_number > 0:
                     return current_level_number
         except (IOError, OSError, json.JSONDecodeError) as e:
-            print(f"Ошибка при загрузке прогресса: {e}")
+            logger.error(f" {type(e).__name__}: {str(e)}",
+                         exc_info=True)
     return 1
 
 
-def load_score():
+def load_achievements():
     try:
         if os.path.exists(SAVE_FILE):
             with open(SAVE_FILE, 'r') as save_file:
@@ -71,8 +73,23 @@ def load_score():
             max_level = 1
             max_infinite_score = 0
     except (IOError, OSError, json.JSONDecodeError) as e:
-        print(f"Ошибка при загрузке данных: {e}")
+        logger.error(f" {type(e).__name__}: {str(e)}",
+                     exc_info=True)
         max_level = 1
         max_infinite_score = 0
 
     return max_level, max_infinite_score
+
+
+if not os.path.exists('logs'):
+    os.makedirs('logs')
+
+logging.basicConfig(
+    filename='logs/game_errors.log',
+    level=logging.ERROR,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    encoding='utf-8'
+)
+
+logger = logging.getLogger()
+

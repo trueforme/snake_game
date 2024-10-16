@@ -259,15 +259,15 @@ def show_infinite_end_screen(snake_length):
 
 
 def show_table_record_screen():
-    max_level, max_infinite_score = load_score()
+    max_level, last_score = load_achievements()
 
     screen.fill('black')
     font = pg.font.SysFont('Arial', 48)
 
-    level_text = font.render(f"Максимальный пройденный уровень: {max_level}",
+    level_text = font.render(f"Количество пройденных уровней: {max_level - 1}",
                              True, (255, 255, 255))
     score_text = font.render(
-        f"Максимальные очки в бесконечном режиме: {max_infinite_score}", True,
+        f"Последний рекорд в бесконечном режиме: {last_score}", True,
         (255, 255, 255))
     ok_text = font.render("OK", True, (255, 255, 255))
 
